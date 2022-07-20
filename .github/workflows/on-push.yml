@@ -1,4 +1,4 @@
-name: on-push
+name: Integration
 
 on: [push, pull_request]
 

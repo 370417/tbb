@@ -1,4 +1,4 @@
-# Lorem ipusum
+# Lorem ipsum
 
 ```console
 $ tbb
