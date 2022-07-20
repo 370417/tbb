@@ -1,0 +1,16 @@
+[package]
+name = "tbb_test"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+# Reduces boilerplate around consuming errors
+anyhow = "1.0"
+# Git bindings used to make sure we don't irrecoverably erase anything
+git2 = "0.14.4"
+# Parses markdown
+pulldown-cmark = { version = "0.9.1", default-features = false }
+# Handles shell-style quotation and escaping
+shell-words = "1.1.0"

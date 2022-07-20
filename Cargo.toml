@@ -1,0 +1,15 @@
+[package]
+name = "tbb"
+version = "0.1.0"
+edition = "2021"
+
+[workspace]
+members = ["tbb_test"]
+
+[dependencies]
+# Reduces boilerplate around consuming errors
+anyhow = "1.0"
+
+[dev-dependencies]
+tbb_test = { path = "tbb_test" }
+
