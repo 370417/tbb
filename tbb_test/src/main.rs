@@ -2,7 +2,7 @@ use std::{env, fs, path::Path};
 
 use anyhow::{anyhow, Result};
 use git2::{Repository, Status};
-use tbb_test::{for_each_code_block, rewrite, run_commands, Mode};
+use tbb_test::{for_each_code_block, rewrite, run_commands, with_doc, Mode};
 
 fn main() -> Result<()> {
     match env::args().skip(1).next() {
@@ -14,41 +14,29 @@ fn main() -> Result<()> {
 
 fn generate_coverage() -> Result<()> {
     for path in get_md_arguments()? {
-        let contents = fs::read_to_string(path.clone())?;
-        // Assume the first 10 chars are the date
-        let date: String = contents.chars().take(10).collect();
-        let db_path = path.clone() + ".sqlite3";
-        for_each_code_block(&contents, |code| {
-            run_commands(code, Mode::Coverage, &db_path, &date)
-                .expect("Error running code coverage");
-        });
-        let db_path = Path::new(&db_path);
-        if db_path.exists() {
-            fs::remove_file(Path::new(&db_path))?;
-        }
+        with_doc(&path, |contents, date, db_path| {
+            for_each_code_block(&contents, |code| {
+                run_commands(code, Mode::Coverage, &db_path, &date)
+                    .expect("Error running code coverage");
+            })
+        })?;
     }
     Ok(())
 }
 
 fn update_doc_examples() -> Result<()> {
     for path in get_valid_arguments()? {
-        let contents = fs::read_to_string(path.clone())?;
-        // Assume the first 10 chars are the date
-        let date: String = contents.chars().take(10).collect();
-        let db_path = path.clone() + ".sqlite3";
-        let new_contents = rewrite(&contents, |code| {
-            run_commands(code, Mode::Run, &db_path, &date).unwrap()
-        });
-        let db_path = Path::new(&db_path);
-        if db_path.exists() {
-            fs::remove_file(Path::new(&db_path))?;
-        }
+        let new_contents = with_doc(&path, |contents, date, db_path| {
+            rewrite(contents, |code| {
+                run_commands(code, Mode::Run, db_path, date).unwrap()
+            })
+        })?;
         fs::write(path, new_contents)?;
     }
     Ok(())
 }
 
-/// Returns command line arguments that:
+/// Returns command line arguments that satisfy all three conditions below:
 /// - end in .md
 /// - represent files checked into git
 /// - represent files that have no uncommited changes
