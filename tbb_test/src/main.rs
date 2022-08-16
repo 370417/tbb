@@ -5,7 +5,7 @@ use git2::{Repository, Status};
 use tbb_test::{for_each_code_block, rewrite, run_commands, with_doc, Mode};
 
 fn main() -> Result<()> {
-    match env::args().skip(1).next() {
+    match env::args().nth(1) {
         Some(mode) if &mode == "coverage" => generate_coverage(),
         Some(mode) if &mode == "update" => update_doc_examples(),
         _ => Err(anyhow!("Usage: tbb_test <coverage|update> files...")),
@@ -15,8 +15,8 @@ fn main() -> Result<()> {
 fn generate_coverage() -> Result<()> {
     for path in get_md_arguments()? {
         with_doc(&path, |contents, date, db_path| {
-            for_each_code_block(&contents, |code| {
-                run_commands(code, Mode::Coverage, &db_path, &date)
+            for_each_code_block(contents, |code| {
+                run_commands(code, Mode::Coverage, db_path, date)
                     .expect("Error running code coverage");
             })
         })?;
@@ -36,6 +36,10 @@ fn update_doc_examples() -> Result<()> {
     Ok(())
 }
 
+/// A vector of command line arguments treated as paths
+/// plus an associated git status for each argument.
+type ArgsWithStatus = Vec<(String, Status)>;
+
 /// Returns command line arguments that satisfy all three conditions below:
 /// - end in .md
 /// - represent files checked into git
@@ -45,18 +49,17 @@ fn get_valid_arguments() -> Result<Vec<String>> {
 
     let repo = Repository::open(".")?;
 
-    let md_args_with_status: Vec<(String, Status)> = md_args
+    let md_args_with_status: ArgsWithStatus = md_args
         .into_iter()
         .map(|arg| {
             repo.status_file(Path::new(&arg))
-                .and_then(|status| Ok((arg, status)))
+                .map(|status| (arg, status))
         })
         .collect::<Result<_, _>>()?;
 
-    let (current_md_args, modified_md_args): (Vec<(String, Status)>, Vec<(String, Status)>) =
-        md_args_with_status
-            .into_iter()
-            .partition(|(_, status)| *status == Status::CURRENT);
+    let (current_md_args, modified_md_args): (ArgsWithStatus, ArgsWithStatus) = md_args_with_status
+        .into_iter()
+        .partition(|(_, status)| *status == Status::CURRENT);
 
     if !modified_md_args.is_empty() {
         eprintln!(

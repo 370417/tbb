@@ -39,9 +39,9 @@ pub fn run_commands(
     db_filename: &str,
     date: &str,
 ) -> anyhow::Result<String> {
-    let mut command_lines = code.lines().filter(|line| line.starts_with("$ tbb"));
+    let command_lines = code.lines().filter(|line| line.starts_with("$ tbb"));
     let mut net_output = String::new();
-    while let Some(line) = command_lines.next() {
+    for line in command_lines {
         let command = line.replacen("$ tbb", mode.command_fragment(), 1);
         let mut args = shell_words::split(&command)?;
         let command = args.remove(0);

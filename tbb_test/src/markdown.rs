@@ -7,7 +7,7 @@ pub fn for_each_code_block<F>(markdown: &str, fun: F)
 where
     F: Fn(&str),
 {
-    let parser = Parser::new(&markdown);
+    let parser = Parser::new(markdown);
     let mut is_in_code_block = false;
     parser.for_each(|event| match event {
         Event::Start(Tag::CodeBlock(CodeBlockKind::Fenced(lang))) => {
@@ -31,7 +31,7 @@ where
     // and replace code blocks when we come across them.
     // This is slow but simple.
     let mut markdown_bytes = markdown.as_bytes().to_vec();
-    let parser = Parser::new(&markdown);
+    let parser = Parser::new(markdown);
     let mut is_in_code_block = false;
     parser
         .into_offset_iter()
