@@ -6,9 +6,7 @@ use tbb_test::{for_each_code_block, run_commands, with_doc, Mode};
 
 #[test]
 fn test_doc_regression() -> anyhow::Result<()> {
-    let mut docs_path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
-    docs_path.push("docs");
-    for doc in fs::read_dir(docs_path)? {
+    for doc in fs::read_dir(docs_path())? {
         let path = doc?.path();
         let path = path.to_str().expect("doc path is not a string");
         with_doc(path, |contents, date, db_path| {
@@ -23,4 +21,10 @@ fn test_doc_regression() -> anyhow::Result<()> {
         })?;
     }
     Ok(())
+}
+
+fn docs_path() -> PathBuf {
+    let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    path.push("docs");
+    path
 }

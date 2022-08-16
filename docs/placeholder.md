@@ -1,6 +1,8 @@
+2022-06-30
+
 # Lorem ipsum
 
 ```console
-$ tbb
-Hello, world!
+$ tbb status
+[ Jun 2022 ]
 ```
