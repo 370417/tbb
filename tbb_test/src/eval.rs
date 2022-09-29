@@ -50,16 +50,16 @@ pub fn run_commands(
             .env("TBB_DEFAULT_DATE", date)
             .args(args)
             .output()?;
-        // Constraint: we only ever output to stdout xor stderr.
-        // To support both at once, we'd need to watch the output as it arrives
-        // and interleave it into one string.
-        if !output.stdout.is_empty() && !output.stderr.is_empty() {
-            return Err(anyhow!("stdout and stderr both exist"));
-        }
         net_output.push_str(line);
         net_output.push('\n');
         net_output.push_str(std::str::from_utf8(&output.stdout)?);
         net_output.push_str(std::str::from_utf8(&output.stderr)?);
+        // Constraint: we only ever output to stdout xor stderr.
+        // To support both at once, we'd need to watch the output as it arrives
+        // and interleave it into one string.
+        if !output.stdout.is_empty() && !output.stderr.is_empty() {
+            return Err(anyhow!("stdout and stderr both exist\n{net_output}"));
+        }
     }
     Ok(net_output)
 }
