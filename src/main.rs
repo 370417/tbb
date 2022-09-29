@@ -15,12 +15,12 @@ fn main() -> Result<()> {
 }
 
 #[derive(Parser)]
-#[clap()]
+#[command()]
 struct Args {
     #[clap(subcommand)]
     pub command: Commands,
     /// Path to sqlite file; defaults to $TBB_DB_FILE
-    #[clap(long)]
+    #[arg(long)]
     pub db: Option<String>,
 }
 
