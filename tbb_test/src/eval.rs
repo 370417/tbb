@@ -15,7 +15,7 @@ impl Mode {
     fn command_fragment(self) -> &'static str {
         match self {
             Mode::Run => "cargo run -q --",
-            Mode::Coverage => "cargo llvm-cov run --no-report --",
+            Mode::Coverage => "cargo llvm-cov run -q --no-report --",
         }
     }
 }
