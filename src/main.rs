@@ -8,7 +8,7 @@ fn main() -> Result<()> {
     let today = date::init_date()?;
 
     match args.command {
-        Commands::Status => println!("[ {} ]", date::format_month_year(&today)?),
+        Command::Status => println!("[ {} ]", date::format_month_year(&today)?),
     }
 
     Ok(())
@@ -18,14 +18,14 @@ fn main() -> Result<()> {
 #[command()]
 struct Args {
     #[clap(subcommand)]
-    pub command: Commands,
+    pub command: Command,
     /// Path to sqlite file; defaults to $TBB_DB_FILE
     #[arg(long)]
     pub db: Option<String>,
 }
 
 #[derive(Subcommand)]
-enum Commands {
+enum Command {
     /// Show one month's budget
     Status,
 }
