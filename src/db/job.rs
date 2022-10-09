@@ -79,7 +79,7 @@ fn select_outflow_jobs(conn: &Connection) -> Result<Vec<Job>> {
     conn.prepare(
         "SELECT job_id, name, rank FROM jobs
         WHERE job_id != :1
-        ORDER BY name ASC",
+        ORDER BY rank ASC",
     )?
     .query_map([INFLOW_JOB_ID], |row| {
         Ok(Job {
