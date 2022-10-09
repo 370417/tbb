@@ -7,7 +7,7 @@ The main tbb repo uses tbb_test as a library to verify that the examples in the 
 ## Usage
 
 ```console
-$ tbb <coverage|update> files...
+$ tbb_test <coverage|update> files...
 ```
 
 Running with the subcommand `coverage` will run [cargo-llvm-cov](https://github.com/taiki-e/cargo-llvm-cov) without output. To generate a report, run `cargo llvm-cov report --lcov`. Cargo-llvm-cov needs to be installed.
