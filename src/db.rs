@@ -20,6 +20,13 @@ impl Db {
         }
     }
 
+    #[allow(dead_code)]
+    pub fn create_in_memory() -> Result<Db> {
+        Ok(Db {
+            state: DbState::Connection(init_db(Connection::open_in_memory()?)?),
+        })
+    }
+
     fn get_conn(&mut self) -> Result<&mut Connection> {
         let state = std::mem::take(&mut self.state);
 

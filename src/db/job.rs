@@ -2,10 +2,11 @@ use rusqlite::{named_params, Connection, Result};
 
 use super::Db;
 
+#[allow(dead_code)]
 pub struct Job {
-    _id: i64,
-    _name: String,
-    _rank: i64,
+    pub name: String,
+    pub rank: i64,
+    id: i64,
 }
 
 pub const INFLOW_JOB_ID: i64 = 0;
@@ -32,12 +33,15 @@ impl Db {
         let conn = self.get_conn()?.transaction()?;
         let new_rank = select_max_rank(&conn)? + 1;
         insert(&conn, name, new_rank)?;
+        conn.commit()?;
         Ok(())
     }
 
-    pub fn _select_all_jobs(&mut self) -> anyhow::Result<Vec<Job>> {
+    pub fn select_outflow_jobs(&mut self) -> anyhow::Result<Vec<Job>> {
         let conn = self.get_conn()?.transaction()?;
-        _select_all_jobs(&conn).map_err(anyhow::Error::from)
+        let jobs = select_outflow_jobs(&conn)?;
+        conn.commit()?;
+        Ok(jobs)
     }
 }
 
@@ -48,17 +52,17 @@ fn select_max_rank(conn: &Connection) -> Result<i64> {
     })
 }
 
-fn insert(conn: &Connection, _name: String, _rank: i64) -> Result<Job> {
-    pre_insert(conn, _rank)?;
+fn insert(conn: &Connection, name: String, rank: i64) -> Result<Job> {
+    pre_insert(conn, rank)?;
     conn.execute(
         "INSERT INTO jobs (name, rank) VALUES (:name, :rank)",
         named_params! {
-            ":name": _name,
-            ":rank": _rank,
+            ":name": name,
+            ":rank": rank,
         },
     )?;
-    let _id = conn.last_insert_rowid();
-    Ok(Job { _id, _name, _rank })
+    let id = conn.last_insert_rowid();
+    Ok(Job { id, name, rank })
 }
 
 /// Update ranks of other jobs before inserting a new job into the category
@@ -71,16 +75,17 @@ fn pre_insert(conn: &Connection, rank: i64) -> Result<()> {
     Ok(())
 }
 
-fn _select_all_jobs(conn: &Connection) -> Result<Vec<Job>> {
+fn select_outflow_jobs(conn: &Connection) -> Result<Vec<Job>> {
     conn.prepare(
-        "SELECT job_id, name, rank, category_id FROM jobs
+        "SELECT job_id, name, rank FROM jobs
+        WHERE job_id != :1
         ORDER BY name ASC",
     )?
-    .query_map([], |row| {
+    .query_map([INFLOW_JOB_ID], |row| {
         Ok(Job {
-            _id: row.get(0)?,
-            _name: row.get(1)?,
-            _rank: row.get(2)?,
+            id: row.get(0)?,
+            name: row.get(1)?,
+            rank: row.get(2)?,
         })
     })?
     .collect()

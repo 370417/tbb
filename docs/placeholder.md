@@ -6,4 +6,7 @@
 $ tbb status
 [ Jun 2022 ]
 $ tbb job add foo
+$ tbb status
+[ Jun 2022 ]
+foo
 ```

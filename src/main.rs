@@ -1,5 +1,6 @@
 mod date;
 mod db;
+mod status;
 
 use std::env::VarError;
 
@@ -55,7 +56,7 @@ enum JobCommand {
 impl Command {
     fn execute(&self, db: &mut Db, today: Date) -> Result<()> {
         match self {
-            Self::Status => println!("[ {} ]", date::format_month_year(&today)?),
+            Self::Status => status::print_status(db, today)?,
             Self::Job(job_command) => job_command.execute(db)?,
         }
         Ok(())

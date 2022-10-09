@@ -25,7 +25,7 @@ where
     let output = fun(&contents, &date, &db_path);
     let db_path = Path::new(&db_path);
     if db_path.exists() {
-        fs::remove_file(Path::new(&db_path))?;
+        fs::remove_file(db_path)?;
     }
     Ok(output)
 }

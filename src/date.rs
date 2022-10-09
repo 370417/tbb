@@ -9,7 +9,7 @@ pub fn init_date() -> Result<Date> {
         .or_else(|_| get_today())
 }
 
-pub fn get_today() -> Result<Date> {
+fn get_today() -> Result<Date> {
     OffsetDateTime::now_local()
         .map(OffsetDateTime::date)
         .map_err(anyhow::Error::from)
