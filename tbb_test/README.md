@@ -10,6 +10,6 @@ The main tbb repo uses tbb_test as a library to verify that the examples in the 
 $ tbb <coverage|update> files...
 ```
 
-Running with the subcommand `coverage` will run [cargo-llvm-cov](https://github.com/taiki-e/cargo-llvm-cov) without output. To generate a report, run `cargo llvm-cov --no-run --lcov`. Cargo-llvm-cov needs to be installed.
+Running with the subcommand `coverage` will run [cargo-llvm-cov](https://github.com/taiki-e/cargo-llvm-cov) without output. To generate a report, run `cargo llvm-cov report --lcov`. Cargo-llvm-cov needs to be installed.
 
 Running with the subcommand `update` will update the examples in the docs. Files will only be modified if they have no uncommited changes.

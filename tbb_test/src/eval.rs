@@ -32,7 +32,7 @@ impl Mode {
 /// In run mode, this function runs commands normally, withe cargo run.
 ///
 /// In coverage mode, this function runs commands to generate coverage using cargo-llvm-cov.
-/// To get the actual coverage report, `cargo llvm-cov --no-run --lcov` should be run separately
+/// To get the actual coverage report, `cargo llvm-cov report --lcov` should be run separately
 pub fn run_commands(
     code: &str,
     mode: Mode,

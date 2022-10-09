@@ -28,7 +28,7 @@ jobs:
       - name: Generate code coverage
         run: |
           cargo run --manifest-path tbb_test/Cargo.toml -- coverage docs/*
-          cargo llvm-cov --no-run --lcov --output-path lcov.info
+          cargo llvm-cov report --lcov --output-path lcov.info
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
