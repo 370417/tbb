@@ -21,9 +21,12 @@ where
 {
     let contents = fs::read_to_string(path)?;
     let date: String = contents.chars().take(10).collect();
-    let db_path = path.to_owned() + ".sqlite3";
-    let output = fun(&contents, &date, &db_path);
-    let db_path = Path::new(&db_path);
+    let db_path_str = path.to_owned() + ".sqlite3";
+    let db_path = Path::new(&db_path_str);
+    if db_path.exists() {
+        return Err(anyhow::anyhow!("File {} already exists", db_path_str));
+    }
+    let output = fun(&contents, &date, &db_path_str);
     if db_path.exists() {
         fs::remove_file(db_path)?;
     }
