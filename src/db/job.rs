@@ -1,4 +1,5 @@
-use rusqlite::{named_params, Connection, Result};
+use anyhow::Result;
+use rusqlite::{named_params, Connection};
 
 use super::Db;
 
@@ -15,7 +16,7 @@ pub(super) fn init(conn: &Connection) -> Result<()> {
     conn.execute(
         "CREATE TABLE IF NOT EXISTS jobs (
             job_id INTEGER NOT NULL PRIMARY KEY,
-            name   TEXT NOT NULL COLLATE NOCASE,
+            name   TEXT NOT NULL COLLATE NOCASE UNIQUE,
             rank   INTEGER NOT NULL
         )",
         [],
@@ -46,13 +47,15 @@ impl Db {
 }
 
 /// Returns 0 if no rows are found
-fn select_max_rank(conn: &Connection) -> Result<i64> {
-    conn.query_row("SELECT COALESCE(MAX(rank), 0) FROM jobs", [], |row| {
+fn select_max_rank(conn: &Connection) -> rusqlite::Result<i64> {
+    let max_rank = conn.query_row("SELECT COALESCE(MAX(rank), 0) FROM jobs", [], |row| {
         row.get(0)
-    })
+    })?;
+    Ok(max_rank)
 }
 
 fn insert(conn: &Connection, name: String, rank: i64) -> Result<Job> {
+    verify_unique(conn, name.clone())?;
     pre_insert(conn, rank)?;
     conn.execute(
         "INSERT INTO jobs (name, rank) VALUES (:name, :rank)",
@@ -63,6 +66,18 @@ fn insert(conn: &Connection, name: String, rank: i64) -> Result<Job> {
     )?;
     let id = conn.last_insert_rowid();
     Ok(Job { id, name, rank })
+}
+
+fn verify_unique(conn: &Connection, name: String) -> Result<()> {
+    let count: i64 = conn.query_row(
+        "SELECT COUNT(*) FROM jobs WHERE name == :1",
+        [name],
+        |row| row.get(0),
+    )?;
+    match count {
+        0 => Ok(()),
+        _ => Err(anyhow::anyhow!("Job name is not unique")),
+    }
 }
 
 /// Update ranks of other jobs before inserting a new job into the category

@@ -6,9 +6,13 @@
 $ tbb status
 [ Jun 2022 ]
 $ tbb job add foo
-$ tbb job add bar
+$ tbb job add fOo
+Error: Job name is not unique
 $ tbb status
 [ Jun 2022 ]
 foo
-bar
+```
+
+```consol
+$ tbb account add foo
 ```
