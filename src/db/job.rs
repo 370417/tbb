@@ -81,12 +81,13 @@ fn select_outflow_jobs(conn: &Connection) -> Result<Vec<Job>> {
         WHERE job_id != :1
         ORDER BY rank ASC",
     )?
-    .query_map([INFLOW_JOB_ID], |row| {
+    .query([INFLOW_JOB_ID])?
+    .and_then(|row| {
         Ok(Job {
             id: row.get(0)?,
             name: row.get(1)?,
             rank: row.get(2)?,
         })
-    })?
+    })
     .collect()
 }
