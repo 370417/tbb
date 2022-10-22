@@ -1,7 +1,10 @@
 use anyhow::Result;
 use rusqlite::{named_params, Connection};
 
-use super::Db;
+use super::common::{
+    rank::{pre_insert, select_max_rank},
+    verify_unique,
+};
 
 #[allow(dead_code)]
 pub struct Job {
@@ -29,16 +32,16 @@ pub(super) fn init(conn: &Connection) -> Result<()> {
     Ok(())
 }
 
-impl Db {
-    pub fn insert_job(&mut self, name: String) -> anyhow::Result<()> {
+impl super::Db {
+    pub fn insert_job(&mut self, name: String) -> Result<()> {
         let conn = self.get_conn()?.transaction()?;
-        let new_rank = select_max_rank(&conn)? + 1;
+        let new_rank = select_max_rank(&conn, "jobs")? + 1;
         insert(&conn, name, new_rank)?;
         conn.commit()?;
         Ok(())
     }
 
-    pub fn select_outflow_jobs(&mut self) -> anyhow::Result<Vec<Job>> {
+    pub fn select_outflow_jobs(&mut self) -> Result<Vec<Job>> {
         let conn = self.get_conn()?.transaction()?;
         let jobs = select_outflow_jobs(&conn)?;
         conn.commit()?;
@@ -46,17 +49,9 @@ impl Db {
     }
 }
 
-/// Returns 0 if no rows are found
-fn select_max_rank(conn: &Connection) -> rusqlite::Result<i64> {
-    let max_rank = conn.query_row("SELECT COALESCE(MAX(rank), 0) FROM jobs", [], |row| {
-        row.get(0)
-    })?;
-    Ok(max_rank)
-}
-
 fn insert(conn: &Connection, name: String, rank: i64) -> Result<Job> {
-    verify_unique(conn, name.clone())?;
-    pre_insert(conn, rank)?;
+    verify_unique(conn, "name", name.clone(), "jobs")?;
+    pre_insert(conn, rank, "jobs")?;
     conn.execute(
         "INSERT INTO jobs (name, rank) VALUES (:name, :rank)",
         named_params! {
@@ -66,28 +61,6 @@ fn insert(conn: &Connection, name: String, rank: i64) -> Result<Job> {
     )?;
     let id = conn.last_insert_rowid();
     Ok(Job { id, name, rank })
-}
-
-fn verify_unique(conn: &Connection, name: String) -> Result<()> {
-    let count: i64 = conn.query_row(
-        "SELECT COUNT(*) FROM jobs WHERE name == :1",
-        [name],
-        |row| row.get(0),
-    )?;
-    match count {
-        0 => Ok(()),
-        _ => Err(anyhow::anyhow!("Job name is not unique")),
-    }
-}
-
-/// Update ranks of other jobs before inserting a new job into the category
-fn pre_insert(conn: &Connection, rank: i64) -> Result<()> {
-    conn.execute(
-        "UPDATE jobs SET rank = rank + 1
-        WHERE rank >= :1",
-        [rank],
-    )?;
-    Ok(())
 }
 
 fn select_outflow_jobs(conn: &Connection) -> Result<Vec<Job>> {

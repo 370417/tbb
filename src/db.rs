@@ -1,3 +1,5 @@
+mod account;
+mod common;
 mod job;
 
 use anyhow::Result;
@@ -43,6 +45,7 @@ impl Db {
 }
 
 fn init_db(conn: Connection) -> Result<Connection> {
+    account::init(&conn)?;
     job::init(&conn)?;
     Ok(conn)
 }

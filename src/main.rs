@@ -45,7 +45,14 @@ enum Command {
     /// Show one month's budget
     Status,
     #[clap(subcommand)]
+    Account(AccountCommand),
+    #[clap(subcommand)]
     Job(JobCommand),
+}
+
+#[derive(Subcommand)]
+enum AccountCommand {
+    Add { account_name: String },
 }
 
 #[derive(Subcommand)]
@@ -57,9 +64,18 @@ impl Command {
     fn execute(&self, db: &mut Db, today: Date) -> Result<()> {
         match self {
             Self::Status => status::print_status(db, today)?,
+            Self::Account(account_command) => account_command.execute(db)?,
             Self::Job(job_command) => job_command.execute(db)?,
         }
         Ok(())
+    }
+}
+
+impl AccountCommand {
+    fn execute(&self, db: &mut Db) -> Result<()> {
+        match self {
+            Self::Add { account_name } => db.insert_account(account_name.clone()),
+        }
     }
 }
 
