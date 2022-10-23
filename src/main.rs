@@ -5,9 +5,10 @@ mod status;
 use std::env::VarError;
 
 use anyhow::{anyhow, Result};
+use chrono::NaiveDate;
 use clap::{Parser, Subcommand};
+
 use db::Db;
-use time::Date;
 
 fn main() -> Result<()> {
     let args = Args::parse();
@@ -61,7 +62,7 @@ enum JobCommand {
 }
 
 impl Command {
-    fn execute(&self, db: &mut Db, today: Date) -> Result<()> {
+    fn execute(&self, db: &mut Db, today: NaiveDate) -> Result<()> {
         match self {
             Self::Status => status::print_status(db, today)?,
             Self::Account(account_command) => account_command.execute(db)?,

@@ -10,7 +10,7 @@ members = ["tbb_test"]
 # Reduces boilerplate around consuming errors
 anyhow = "1.0"
 # Used for anything date-related
-time = { version =  "0.3", features = ["formatting", "local-offset", "parsing", "macros"] }
+chrono = "0.4"
 # CLI parsing
 clap = { version = "4.0", features = ["derive"] }
 # Easy colors and styling in the terminal.
