@@ -6,6 +6,25 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
+  experimental:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Install Rust
+        run: rustup toolchain install stable --component llvm-tools-preview
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@cargo-llvm-cov
+      - uses: Swatinem/rust-cache@v2
+      - name: Run tests
+        run: |
+          cargo test --verbose --manifest-path tbb_test/Cargo.toml
+          cargo llvm-cov --no-report
+          cargo llvm-cov report --lcov --output-path lcov.info
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.TBB_CODECOV }}
+          files: lcov.info
   integration:
     runs-on: ubuntu-latest
     steps:
@@ -17,22 +36,3 @@ jobs:
         run: |
           cargo test --verbose
           cargo test --verbose --manifest-path tbb_test/Cargo.toml
-  coverage:
-    needs: integration
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Install Rust
-        run: rustup toolchain install stable --component llvm-tools-preview
-      - name: Install cargo-llvm-cov
-        uses: taiki-e/install-action@cargo-llvm-cov
-      - uses: Swatinem/rust-cache@v2
-      - name: Generate code coverage
-        run: |
-          cargo run --manifest-path tbb_test/Cargo.toml -- coverage docs/*
-          cargo llvm-cov report --lcov --output-path lcov.info
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v3
-        with:
-          token: ${{ secrets.TBB_CODECOV }}
-          files: lcov.info
