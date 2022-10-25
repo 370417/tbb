@@ -6,7 +6,7 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  experimental:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -24,14 +24,3 @@ jobs:
         with:
           token: ${{ secrets.TBB_CODECOV }}
           files: lcov.info
-  integration:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: Swatinem/rust-cache@v2
-      - name: Build
-        run: cargo build --verbose
-      - name: Run tests
-        run: |
-          cargo test --verbose
-          cargo test --verbose --manifest-path tbb_test/Cargo.toml
