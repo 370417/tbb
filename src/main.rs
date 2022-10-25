@@ -1,3 +1,6 @@
+// Dead code warnings cause tests to fail
+#![allow(dead_code)]
+
 mod date;
 mod db;
 mod status;

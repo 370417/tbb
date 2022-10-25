@@ -14,5 +14,9 @@ foo
 ```
 
 ```console
-$ tbb account add foo
+$ tbb account add acc
+```
+
+```
+$ tbb inflow 100 acc foo
 ```

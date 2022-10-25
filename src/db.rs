@@ -22,7 +22,6 @@ impl Db {
         }
     }
 
-    #[allow(dead_code)]
     pub fn create_in_memory() -> Result<Db> {
         Ok(Db {
             state: DbState::Connection(init_db(Connection::open_in_memory()?)?),

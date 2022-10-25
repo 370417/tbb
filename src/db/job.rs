@@ -6,7 +6,6 @@ use super::common::{
     verify_unique,
 };
 
-#[allow(dead_code)]
 pub struct Job {
     pub name: String,
     pub rank: i64,
@@ -15,7 +14,7 @@ pub struct Job {
 
 pub const INFLOW_JOB_ID: i64 = 0;
 
-pub(super) fn init(conn: &Connection) -> Result<()> {
+pub fn init(conn: &Connection) -> Result<()> {
     conn.execute(
         "CREATE TABLE IF NOT EXISTS jobs (
             job_id INTEGER NOT NULL PRIMARY KEY,

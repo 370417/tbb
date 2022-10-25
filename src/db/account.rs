@@ -6,14 +6,13 @@ use super::common::{
     verify_unique,
 };
 
-#[allow(dead_code)]
 pub struct Account {
     pub name: String,
     pub rank: i64,
     id: i64,
 }
 
-pub(super) fn init(conn: &Connection) -> Result<()> {
+pub fn init(conn: &Connection) -> Result<()> {
     conn.execute(
         "CREATE TABLE IF NOT EXISTS accounts (
             account_id INTEGER NOT NULL PRIMARY KEY,

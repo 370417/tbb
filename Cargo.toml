@@ -21,5 +21,6 @@ colored = "2.0"
 rusqlite = { version = "0.28", features = ["bundled"] }
 
 [dev-dependencies]
+proptest = "1.0"
 tbb_test = { path = "tbb_test" }
 
