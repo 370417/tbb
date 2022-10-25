@@ -6,7 +6,7 @@
 $ tbb status
 [ Jun 2022 ]
 $ tbb job add foo
-$ tbb job add fOo
+$ tbb job add fOoo
 Error: name is not unique in jobs
 $ tbb status
 [ Jun 2022 ]
