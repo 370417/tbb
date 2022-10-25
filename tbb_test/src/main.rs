@@ -1,27 +1,11 @@
 use std::{env, fs, path::Path};
 
-use anyhow::{anyhow, Result};
+use anyhow::Result;
 use git2::{Repository, Status};
-use tbb_test::{for_each_code_block, rewrite, run_commands, with_doc, Mode};
+use tbb_test::{rewrite, run_commands, with_doc, Mode};
 
 fn main() -> Result<()> {
-    match env::args().nth(1) {
-        Some(mode) if &mode == "coverage" => generate_coverage(),
-        Some(mode) if &mode == "update" => update_doc_examples(),
-        _ => Err(anyhow!("Usage: tbb_test <coverage|update> files...")),
-    }
-}
-
-fn generate_coverage() -> Result<()> {
-    for path in get_md_arguments()? {
-        with_doc(&path, |contents, date, db_path| {
-            for_each_code_block(contents, |code| {
-                run_commands(code, Mode::Coverage, db_path, date)
-                    .expect("Error running code coverage");
-            })
-        })?;
-    }
-    Ok(())
+    update_doc_examples()
 }
 
 fn update_doc_examples() -> Result<()> {
