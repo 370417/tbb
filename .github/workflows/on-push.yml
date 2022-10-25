@@ -17,8 +17,7 @@ jobs:
       - uses: Swatinem/rust-cache@v2
       - name: Run tests
         run: |
-          cargo llvm-cov --no-report -- --manifest-path tbb_test/Cargo.toml
-          TBB_COVERAGE=1 cargo llvm-cov --no-report
+          TBB_COVERAGE=1 cargo llvm-cov --no-report --workspace
           cargo llvm-cov report --lcov --output-path lcov.info
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
