@@ -1,6 +1,7 @@
 mod account;
 mod common;
 mod job;
+mod job_balance;
 
 use anyhow::Result;
 use rusqlite::Connection;
@@ -46,6 +47,7 @@ impl Db {
 fn init_db(conn: Connection) -> Result<Connection> {
     account::init(&conn)?;
     job::init(&conn)?;
+    job_balance::init(&conn)?;
     Ok(conn)
 }
 

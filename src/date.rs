@@ -18,7 +18,10 @@ pub fn format_month_year(date: &NaiveDate) -> String {
     date.format("%b %Y").to_string()
 }
 
-#[derive(PartialEq, Eq, PartialOrd, Ord)]
+/// YearMonth exists so that the year and month can be combined
+/// into one column in the database. We do this to simplify
+/// comparisons between dates.
+#[derive(PartialEq, Eq, PartialOrd, Ord, Clone, Copy)]
 pub struct YearMonth {
     pub year: i64,
     /// 0-indexed
@@ -46,17 +49,23 @@ mod tests {
 
     use super::*;
 
+    #[test]
+    fn jan_0_is_origin() {
+        let origin = YearMonth { year: 0, month: 0 };
+        assert_eq!(origin.to_int(), 0);
+    }
+
     proptest! {
         #[test]
-        fn month_same_after_roundtrip(month_int: i64) {
-            prop_assert_eq!(month_int, YearMonth::from_int(month_int).to_int());
+        fn year_month_same_after_roundtrip(int: i64) {
+            prop_assert_eq!(int, YearMonth::from_int(int).to_int());
         }
 
         #[test]
-        fn month_preserves_order(month_int1: i64, month_int2: i64) {
-            let month1 = YearMonth::from_int(month_int1);
-            let month2 = YearMonth::from_int(month_int2);
-            prop_assert_eq!(month_int1.cmp(&month_int2), month1.cmp(&month2));
+        fn year_month_from_int_preserves_order(int1: i64, int2: i64) {
+            let year_month1 = YearMonth::from_int(int1);
+            let year_month2 = YearMonth::from_int(int2);
+            prop_assert_eq!(int1.cmp(&int2), year_month1.cmp(&year_month2));
         }
     }
 }
